@@ -1,0 +1,173 @@
+#class {rebuff} {open}
+
+/*
+   Updating this var in game won't change the action,
+   because the alias is already set,
+   but you can hardcode this variable to turn it off for good
+*/
+#VARIABLE {reapply} {on}
+#VARIABLE {buffs} {
+  {FocusMind} {
+    {status} {off}
+    {don} {You focus your mind for battle.}
+    {doff} {You stop focusing your mind.}
+    {scoreStatus} {Your mind is focused.}
+    {reapply} {conc 'focus mind'}
+  }
+  {Strength} {
+    {status} {off}
+    {don} {You feel the Force flow through you and make you stronger!}
+    {doff} {You feel weaker.}
+    {scoreStatus} {You feel the force rippling through your muscles.}
+    {reapply} {conc 'stren'}
+  }
+  {ForceSpeed} {
+    {status} {off}
+    {don} {You feel quicker.}
+    {doff} {You feel much slower.}
+    {scoreStatus} {Your speed is enhanced.}
+    {reapply} {conc 'force speed'}
+  }
+  {ForceReflex} {
+    {status} {off}
+    {don} {You focus yourself and ready yourself for battle.}
+    {doff} {Your focus on your fighting abilities begins to fade.}
+    {scoreStatus} {Your reflexes and instincts have been heightened by the force.}
+    {reapply} {conc 'force reflex'}
+  }
+  {SlowMetabolism} {
+    {status} {off}
+    {don} {You feel your body functions begin to slow down.}
+    {doff} {Your body's functions begin to speed up again.}
+    {scoreStatus} {Your body's functions are moving as slowly as possible.}
+    {reapply} {conc 'slow met'}
+  }
+  {Enmity} {
+    {status} {off}
+    {don} {An aura of hatred and anger begins to flow from you.}
+    {doff} {Your hatred stops flowing so strongly.}
+    {scoreStatus} {You are one with the dark side.}
+    {reapply} {conc 'enm'}
+  }
+  {FearSelf} {
+    {status} {off}
+    {don} {You surround yourself with an aura of fear.}
+    {doff} {Your aura of fear fades away.}
+    {scoreStatus} {You are radiating an aura of fear.}
+    {reapply} {conc 'fear' self}
+  }
+  {SenseDanger} {
+    {status} {off}
+    {don} {You feel your senses stretch beyond the room}
+    {doff} {Your sense of danger diminishes.}
+    {scoreStatus} {You are sensitive to danger.}
+    {reapply} {conc 'sense danger'}
+  }
+  {SensePresence} {
+    {status} {off}
+    {don} {Your senses stretch out across the area.}
+    {doff} {Your senses begin to dull somewhat.}
+    {scoreStatus} {Your senses are finely attuned to picking up life signs.}
+    {reapply} {conc 'sense presence'}
+  }
+  {DetectAlignment} {
+    {status} {off}
+    {don} {Your eyes tingle.}
+    {doff} {You feel less aware of the Dark and Light side of the Force.}
+    {scoreStatus} {You are sensitive to the Force in others.}
+    {reapply} {conc 'detect alignment'}
+  }
+  {SenseForce} {
+    {status} {off}
+    {don} {You close your eyes and attune yourself to the Force.}
+    {doff} {You stop sensing for disturbances in the Force.}
+    {scoreStatus} {You are sensitive to the nature of individuals and places.}
+    {reapply} {conc 'sense force'}
+  }
+  {ForceAffinity}  {
+    {status} {off}
+    {don} {You concentrate and your connection to the force increases.}
+    {doff} {You have lost your close affinity with the force.}
+    {scoreStatus} {Your affinity with the force has increased.}
+    {reapply} {conc 'force affin'}
+  }
+  {EssenceTransfer}  {
+    {status} {off}
+    {don} {You are prepared to transfer your essence in an emergency.}
+    {doff} {Your preparations for essence transfer have gone unused and worn out.}
+    {scoreStatus} {You are prepared to transfer your Essence to a clone.}
+    {reapply} {conc 'essence'}
+  }
+  {DarkSerenity}  {
+    {status} {off}
+    {don} {A feeling of dark deadly serenity comes over you.}
+    {doff} {Your dark serenity leaves you.}
+    {scoreStatus} {You are currently feeling very serene...darkly serene.}
+    {reapply} {conc 'dark seren'}
+  }
+  {Prediction}  {
+    {status} {off}
+    {don} {You begin to trust your feelings and predict the movements of your enemies.}
+    {doff} {Your sense of future events lessens.}
+    {scoreStatus} {You are predicting your enemies movements with great accuracy.}
+    {reapply} {conc 'prediction'}
+  }
+  {SenseWeakness}  {
+    {status} {off}
+    {don} {You begin to sense your enemies weaknesses.}
+    {doff} {You stop sensing the weaknesses of those around you.}
+    {scoreStatus} {You currently sense the weaknesses of others.}
+    {reapply} {conc 'sense weakness'}
+  }
+}
+
+/* Print Buffs */
+#alias {pb} {
+  #loop {1} {&buffs[]} {a} {
+    #if {"$buffs[+$a][status]" == "on"} {
+      #show $green*buffs[+$a] $buffs[+$a][status]
+    };
+    #if {"$buffs[+$a][status]" == "off"} {
+      #show $red*buffs[+$a] $buffs[+$a][status]
+    };
+  }
+}
+
+/* Missing Buffs */
+#alias {mb} {
+  #loop {1} {&buffs[]} {b} {
+    #if {"$buffs[+$b][status]" == "off"} {
+      #show $red*buffs[+$b] $buffs[+$b][status]
+    }
+  }
+}
+
+/* Apply missing buffs */
+#alias {rebuff} {
+  #loop {1} {&buffs[]} {c} {
+    #if {"$buffs[+$c][status]" == "off"} {
+      $buffs[+$c][reapply]
+    }
+  }
+  #var {c} {1}
+}
+
+#if {#line substitute variables $buffs[+$b][status] == 'off'} {#show yeah}
+
+/* When we read the don string, set status to 'on' */
+#loop {1} {&buffs[]} {x} #line substitute variables #action {$buffs[+$x][don]} {
+  #var buffs[+$x][status] {on}
+}
+
+/* When we read the doff string, set status to 'off' */
+#loop {1} {&buffs[]} {z} #line substitute variables #action {$buffs[+$z][doff]} {
+  #var buffs[+$z][status] {off};
+  #if {"$reapply" == "on"} {$buffs[+$z][reapply]};
+}
+
+/* Assuming your MUD has a method to list your applied buffs, this will take those strings and set their status to 'on' */
+#loop {1} {&buffs[]} {y} #line substitute variables #action {$buffs[+$y][scoreStatus]} {
+  #var buffs[+$y][status] {on}
+}
+
+#class {rebuff} {close}
